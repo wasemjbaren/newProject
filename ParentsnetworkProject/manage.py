@@ -20,3 +20,28 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def addParent(request):
+    user = User.objects.filter(is_superuser=False)
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            user.set_password(password)
+            user.save()
+            messages.success(request, 'Parent Added Successfully')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please Fill the Form Correctly')
+    else:
+        form = UserForm()
+    context = {'user':user, 'form': form}
+    return render(request, 'addParent.html', context)
+
+
+def deleteParent(request, pk):
+    user = User.objects.get(id=pk)
+    user.delete()
+    return redirect('addParent')
